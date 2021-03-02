@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/black"
     android:orientation="vertical"
     tools:context="com.parker.uipractice.MainActivity">
 
@@ -23,12 +24,17 @@
 
     <com.parker.uipractice.SwitchButton
         android:id="@+id/switch_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="56dp"
+        android:layout_height="36dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
-        app:switch_off_background="@drawable/off_switch"
-        app:switch_on_background="@drawable/on_switch" />
+        app:border_color="@color/color_white_border"
+        app:border_size="1dp"
+        app:inner_thick="0dp"
+        app:off_color="@color/color_white_switch"
+        app:on_color="@color/color_white_switch"
+        app:switch_off_background="@drawable/switch_off"
+        app:switch_on_background="@drawable/switch_on" />
 
     <com.parker.uipractice.SwitchView
         android:id="@+id/default_switch"

@@ -6,4 +6,6 @@
 
     <color name="color_gradient_start">#425CFF</color>
     <color name="color_gradient_end">#8A8BFF</color>
+    <color name="color_white_switch">#26FFFFFF</color>
+    <color name="color_white_border">#33FFFFFF</color>
 </resources>

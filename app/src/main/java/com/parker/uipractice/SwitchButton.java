@@ -25,12 +25,12 @@ public class SwitchButton extends View {
     /**
      * 默认宽
      */
-    private static final int DEFAULT_WIDTH = dp2pxInt(75);
+    private static final int DEFAULT_WIDTH = dp2pxInt(56);
 
     /**
      * 默认高
      */
-    private static final int DEFAULT_HEIGHT = dp2pxInt(48);
+    private static final int DEFAULT_HEIGHT = dp2pxInt(36);
 
     /**
      * 开关状态
@@ -59,6 +59,16 @@ public class SwitchButton extends View {
     private int buttonBgColor = 0xFFFFFFFF;
 
     /**
+     * 边框颜色
+     */
+    private int borderColor;
+
+    /**
+     * 边框大小
+     */
+    private int borderSize;
+
+    /**
      * 内部圆形跟边缘的距离
      */
     private int innerThick = 8;
@@ -70,6 +80,11 @@ public class SwitchButton extends View {
 
     /**
      * 矩形边框画笔
+     */
+    private Paint paintRoundRectBorder;
+
+    /**
+     * 矩形填充背景画笔
      */
     private Paint paintRoundRect;
 
@@ -140,19 +155,44 @@ public class SwitchButton extends View {
 
     public SwitchButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init();
+        initAttrs(context, attrs);
+    }
+
+    /**
+     * 初始化画笔
+     */
+    private void init() {
         rectF = new RectF();
+        paintRoundRectBorder = new Paint();
         paintRoundRect = new Paint();
         paintRoundButton = new Paint();
         paintRoundUnSwitchRect = new Paint();
+        paintRoundRectBorder.setAntiAlias(true);
+        paintRoundRectBorder.setStyle(Paint.Style.STROKE);
         paintRoundRect.setAntiAlias(true);
         paintRoundButton.setAntiAlias(true);
         paintRoundUnSwitchRect.setAntiAlias(true);
         paintRoundUnSwitchRect.setColor(Color.parseColor("#7fffffff"));
+    }
+
+    /**
+     * 初始化属性
+     *
+     * @param context
+     * @param attrs
+     */
+    private void initAttrs(Context context, AttributeSet attrs) {
         TypedArray mTypedArray = context.obtainStyledAttributes(attrs, R.styleable.SwitchButton);
-        onColor = mTypedArray.getColor(R.styleable.SwitchButton_onColor1, 0xFF32C781);
-        offColor = mTypedArray.getColor(R.styleable.SwitchButton_offColor1, 0xFFC9C9C9);
-        buttonBgColor = mTypedArray.getColor(R.styleable.SwitchButton_buttonBgColor1, 0xFFFFFFFF);
-        switchStatus = mTypedArray.getBoolean(R.styleable.SwitchButton_switchStatus, true);
+        onColor = mTypedArray.getColor(R.styleable.SwitchButton_on_color, 0xFF32C781);
+        offColor = mTypedArray.getColor(R.styleable.SwitchButton_off_color, 0xFFC9C9C9);
+        buttonBgColor = mTypedArray.getColor(R.styleable.SwitchButton_button_bg_color, 0xFFFFFFFF);
+        switchStatus = mTypedArray.getBoolean(R.styleable.SwitchButton_switch_status, true);
+        borderColor = mTypedArray.getColor(R.styleable.SwitchButton_border_color, 0xFFFFFFFF);
+        borderSize = mTypedArray.getDimensionPixelSize(R.styleable.SwitchButton_border_size, 1);
+        innerThick = mTypedArray.getDimensionPixelSize(R.styleable.SwitchButton_inner_thick, 0);
+        Log.d(TAG, "initAttrs: innerThick:" + innerThick);
+
         //开关背景图片
         int switchBgResourceId = mTypedArray.getResourceId(R.styleable.SwitchButton_switch_background, -1);
         int switchOnResourceId = mTypedArray.getResourceId(R.styleable.SwitchButton_switch_on_background, -1);
@@ -161,6 +201,9 @@ public class SwitchButton extends View {
         mTypedArray.recycle();
         rate = switchStatus ? 1.0f : 0.0f;
         paintRoundButton.setColor(buttonBgColor);
+        paintRoundRect.setColor(onColor);
+        paintRoundRectBorder.setColor(borderColor);
+        paintRoundRectBorder.setStrokeWidth(borderSize);
 
         if (switchBgResourceId != -1) {
             setSwitchButtonBackgroundResource(switchBgResourceId);
@@ -174,6 +217,7 @@ public class SwitchButton extends View {
             setSwitchOffButtonResource(switchOffResourceId);
         }
     }
+
 
     /**
      * 设置背景资源
@@ -211,16 +255,17 @@ public class SwitchButton extends View {
         if (widthMode == MeasureSpec.UNSPECIFIED
                 || widthMode == MeasureSpec.AT_MOST) {
             widthMeasureSpec = MeasureSpec.makeMeasureSpec(DEFAULT_WIDTH, MeasureSpec.EXACTLY);
-            Log.d(TAG, "onMeasure: width Mode AT_MOST or UNSPECIFIED");
+            //Log.d(TAG, "onMeasure: width Mode AT_MOST or UNSPECIFIED");
         }
         if (heightMode == MeasureSpec.UNSPECIFIED
                 || heightMode == MeasureSpec.AT_MOST) {
             heightMeasureSpec = MeasureSpec.makeMeasureSpec(DEFAULT_HEIGHT, MeasureSpec.EXACTLY);
-            Log.d(TAG, "onMeasure: height Mode AT_MOST or UNSPECIFIED");
+            //Log.d(TAG, "onMeasure: height Mode AT_MOST or UNSPECIFIED");
         }
 
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
+        Log.d(TAG, "onMeasure:: width:" + width + ",height:" + height);
         int realWidth = width - getPaddingLeft() - getPaddingRight();
         int realHeight = height - getPaddingTop() - getPaddingBottom();
         if (realHeight <= realWidth / 2) {
@@ -230,17 +275,26 @@ public class SwitchButton extends View {
             radius = realWidth / 4;
             height = realWidth / 2 + getPaddingTop() + getPaddingBottom();
         }
+
+        Log.d(TAG, "onMeasure:: width:" + width + ",height:" + height + ",realWidth:" + realWidth + ",realHeight:" + realHeight + ",rasius:" + radius);
+
         rectF.left = getPaddingLeft();
         rectF.right = width - getPaddingRight();
         rectF.top = getPaddingTop();
         rectF.bottom = height - getPaddingBottom();
+        Log.d(TAG, "onMeasure:: (" + rectF.left + "," + rectF.top + "," + rectF.right + "," + rectF.bottom + ")");
         setMeasuredDimension(width, height);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        paintRoundRect.setColor(getColor(rate));
-        canvas.drawRoundRect(rectF, radius, radius, paintRoundRect);
+        //设置渐变背景
+        //paintRoundRect.setColor(getColor(rate));
+        //canvas.drawRoundRect(rectF, radius, radius, paintRoundRect);
+
+        //设置透明背景
+        drawBackground(canvas);
+
         //canvas.drawCircle(getPaddingLeft() + radius + 2 * radius * rate, getPaddingTop() + radius, radius - innerThick, paintRoundButton);
         drawSwitch(canvas);
         if (!isCanSwitch) {
@@ -249,14 +303,30 @@ public class SwitchButton extends View {
     }
 
     /**
+     * 绘制背景
+     *
+     * @param canvas
+     */
+    private void drawBackground(Canvas canvas) {
+        canvas.drawRoundRect(rectF, radius, radius, paintRoundRectBorder);
+        canvas.drawRoundRect(rectF, radius, radius, paintRoundRect);
+    }
+
+    /**
      * 绘制开关
      *
      * @param canvas
      */
     private void drawSwitch(Canvas canvas) {
-        float cx = getPaddingLeft() + radius + 2 * radius * rate;
-        int cy = getPaddingTop() + radius;
+        float cx;
+        if (rate == 1) {
+            cx = getPaddingLeft() + radius + 2 * radius * rate - 3;
+        } else {
+            cx = getPaddingLeft() + radius + 2 * radius * rate;
+        }
+        int cy = getPaddingTop() + radius - 3;
         int radius = this.radius - innerThick;
+        Log.d(TAG, "drawSwitch:: cx:" + cx + ",cy:" + cy + ",raduis:" + radius + ",rate:" + rate);
         //canvas.drawCircle(cx, cy, radius, paintRoundButton);
 
         //绘制开关
@@ -268,6 +338,12 @@ public class SwitchButton extends View {
         }
     }
 
+    /**
+     * 根据比例获取渐变颜色
+     *
+     * @param radio 比例
+     * @return 渐变颜色
+     */
     private int getColor(float radio) {
         int redStart = Color.red(offColor);
         int blueStart = Color.blue(offColor);
@@ -279,6 +355,20 @@ public class SwitchButton extends View {
         int greed = (int) (greenStart + ((greenEnd - greenStart) * radio + 0.5));
         int blue = (int) (blueStart + ((blueEnd - blueStart) * radio + 0.5));
         return Color.argb(255, red, greed, blue);
+    }
+
+    /**
+     * 获取颜色透明度
+     *
+     * @param alpha
+     * @param color
+     * @return
+     */
+    private int getColor(int alpha, int color) {
+        int red = Color.red(color);
+        int blue = Color.blue(color);
+        int green = Color.green(color);
+        return Color.argb(alpha, red, blue, green);
     }
 
     @Override

@@ -151,10 +151,10 @@ public class GradientSwitchView extends View {
         paintRoundUnSwitchRect.setAntiAlias(true);
         paintRoundUnSwitchRect.setColor(Color.parseColor("#7fffffff"));
         TypedArray mTypedArray = context.obtainStyledAttributes(attrs, R.styleable.SwitchView);
-        onColor = mTypedArray.getColor(R.styleable.SwitchView_onColor, 0xFF32C781);
-        offColor = mTypedArray.getColor(R.styleable.SwitchView_offColor, 0xFFC9C9C9);
-        buttonBgColor = mTypedArray.getColor(R.styleable.SwitchView_buttonBgColor, 0xFFFFFFFF);
-        switchStatus = mTypedArray.getBoolean(R.styleable.SwitchView_switchStatus, true);
+        onColor = mTypedArray.getColor(R.styleable.SwitchView_on_color, 0xFF32C781);
+        offColor = mTypedArray.getColor(R.styleable.SwitchView_off_color, 0xFFC9C9C9);
+        buttonBgColor = mTypedArray.getColor(R.styleable.SwitchView_button_bg_color, 0xFFFFFFFF);
+        switchStatus = mTypedArray.getBoolean(R.styleable.SwitchView_switch_status, true);
         mTypedArray.recycle();
         rate = switchStatus ? 1.0f : 0.0f;
         paintRoundButton.setColor(buttonBgColor);
